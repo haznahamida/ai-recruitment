@@ -2,19 +2,43 @@
 <img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
 </div>
 
-# Run and deploy your AI Studio app
+# AI Recruitment System
 
-This contains everything you need to run your app locally.
+## Overview
+This project is an AI-based recruitment assistant that supports basic recruitment-related interactions using natural language processing. The application processes user input and generates textual responses using a Large Language Model (LLM).
 
-View your app in AI Studio: https://ai.studio/apps/drive/11sKKAdiwNZXjLJhoIlI4uqv6utLj9V96
+The system is implemented as a web-based application using Node.js and is intended for academic and learning purposes.
 
-## Run Locally
+---
 
-**Prerequisites:**  Node.js
+## Features
+- Text-based interaction for recruitment scenarios
+- Natural language processing using an LLM
+- Web-based interface
+- Environment variable configuration for API access
+
+---
+
+## Running the Application
+
+### Prerequisites
+- Node.js
+- API key for an external LLM service
+
+### Setup
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/haznahamida/ai-recruitment.git
+   cd ai-recruitment
 
 
 1. Install dependencies:
    `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
+2. Create an environment file:
+   `.env.local`
+3. Add the API key:
+   `LLM_API_KEY=your_api_key_here`
+4. Run the application:
+   `npm run dev`
+7. 
    `npm run dev`
