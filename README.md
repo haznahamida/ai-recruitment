@@ -39,5 +39,3 @@ The system is implemented as a web-based application using Node.js and is intend
    `LLM_API_KEY=your_api_key_here`
 4. Run the application:
    `npm run dev`
-7. 
-   `npm run dev`
