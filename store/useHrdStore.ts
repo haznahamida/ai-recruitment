@@ -1,9 +1,16 @@
 
-
 import { create } from 'zustand';
-import { JobPosition, Candidate, MatchResult, GapAnalysisReport, Notification, ApplicationHistory } from '../types';
+import { JobPosition, Candidate, MatchResult, GapAnalysisReport, Notification, ApplicationHistory, RecruitmentStage } from '../types';
 
-// --- MOCK DATA ---
+const INITIAL_STAGES: RecruitmentStage[] = [
+    { name: 'Screening', status: 'Belum' },
+    { name: 'Psikotest', status: 'Belum' },
+    { name: 'Interview HR', status: 'Belum' },
+    { name: 'Interview User', status: 'Belum' },
+    { name: 'Penawaran', status: 'Belum' },
+];
+
+// --- MOCK CANDIDATES ---
 const MOCK_CANDIDATES: Candidate[] = [
     {
         id: 'cand1',
@@ -15,15 +22,10 @@ const MOCK_CANDIDATES: Candidate[] = [
         skills: [{ id: 's1', name: 'Go', level: 'Advanced' }, { id: 's2', name: 'PostgreSQL', level: 'Intermediate' }, {id: 's-extra1', name: 'Microservices', level: 'Intermediate'}],
         documents: [
             { id: 'hrd-doc-ahmad-1', type: 'resume', name: 'Ahmad_Prasetyo_CV.pdf', url: '#', uploadedAt: '2024-05-10' },
-            { id: 'hrd-doc-ahmad-2', type: 'certificate', name: 'Sertifikat_Go_Advanced.pdf', url: '#', uploadedAt: '2024-05-11' },
         ],
-        activity: [
-            { time: '2024-05-10', event: 'Melamar untuk posisi Backend Developer (Golang)' },
-            { time: '2024-05-11', event: 'Mengunggah sertifikat baru' },
-        ],
+        activity: [{ time: '2024-05-10', event: 'Melamar untuk posisi Backend Developer (Golang)' }],
         applicationHistory: [
-            { id: 'app1', position: 'Backend Developer (Golang)', applied_date: '2024-05-10', status: 'Dalam Proses', stages: [{ name: 'Screening', status: 'Dalam Proses' }, { name: 'Psikotest', status: 'Belum'}, { name: 'Interview HR', status: 'Belum'}, { name: 'Interview User', status: 'Belum' }, { name: 'Penawaran', status: 'Belum' }] },
-            { id: 'app2', position: 'Junior Backend Engineer', applied_date: '2023-11-20', status: 'Ditolak', stages: [{ name: 'Screening', status: 'Lolos' }, { name: 'Psikotest', status: 'Tidak Lolos' }, { name: 'Interview HR', status: 'Belum' }, { name: 'Interview User', status: 'Belum' }, { name: 'Penawaran', status: 'Belum' }] },
+            { id: 'app1', position: 'Backend Developer (Golang)', applied_date: '2024-05-10', status: 'Dalam Proses', stages: [...INITIAL_STAGES] },
         ],
     },
     {
@@ -33,148 +35,75 @@ const MOCK_CANDIDATES: Candidate[] = [
         salaryExpectation: { min: 15000000, max: 22000000 },
         workExperience: [{ id: 'we2', jobTitle: 'Frontend Developer', companyName: 'Digital Solutions', startDate: '2019-06-01', endDate: '2024-01-15', description: 'Built responsive UIs with React and TypeScript.' }],
         education: [{ id: 'edu2', institution: 'Universitas Indonesia', degree: 'S.Kom', fieldOfStudy: 'Ilmu Komputer', startDate: '2015-08-01', endDate: '2019-07-01' }],
-        skills: [{ id: 's3', name: 'React', level: 'Advanced' }, { id: 's4', name: 'TypeScript', level: 'Advanced' }, { id: 's5', name: 'Figma', level: 'Intermediate' }],
-        documents: [
-            { id: 'hrd-doc-citra-1', type: 'resume', name: 'Citra_Kirana_Resume_2024.pdf', url: '#', uploadedAt: new Date(Date.now() - 1000 * 60 * 60 * 8).toISOString() }
-        ],
-        activity: [
-            { time: new Date(Date.now() - 1000 * 60 * 60 * 8).toISOString(), event: 'Mengunggah berkas baru (resume)' },
-            { time: '2024-05-09', event: 'Profil Dilihat oleh HRD' },
-        ],
+        skills: [{ id: 's3', name: 'React', level: 'Advanced' }, { id: 's4', name: 'TypeScript', level: 'Advanced' }],
+        documents: [],
+        activity: [],
         applicationHistory: [
-            { id: 'app3', position: 'Senior Frontend Developer', applied_date: '2024-05-08', status: 'Interview', stages: [{ name: 'Screening', status: 'Lolos' }, { name: 'Psikotest', status: 'Lolos' }, { name: 'Interview HR', status: 'Dalam Proses' }, { name: 'Interview User', status: 'Belum' }, { name: 'Penawaran', status: 'Belum' }] },
-            { id: 'app4', position: 'Frontend Developer', applied_date: '2023-01-15', status: 'Diterima', stages: [{ name: 'Screening', status: 'Lolos' }, { name: 'Psikotest', status: 'Lolos' }, { name: 'Interview HR', status: 'Lolos' }, { name: 'Interview User', status: 'Lolos' }, { name: 'Penawaran', status: 'Lolos' }] },
+            { id: 'app3', position: 'Senior Frontend Developer', applied_date: '2024-05-08', status: 'Dalam Proses', stages: [...INITIAL_STAGES] },
         ],
     },
-     {
-        id: 'cand3',
-        user: { id: 'user3', name: 'Dewi Lestari', email: 'dewi.l@example.com', location: 'Surabaya', role: 'candidate', onlineStatus: 'online', avatarUrl: 'https://i.pravatar.cc/150?u=dewi.l@example.com' },
-        positionApplied: 'UI/UX Designer',
-        salaryExpectation: { min: 10000000, max: 14000000 },
-        workExperience: [{ id: 'we3', jobTitle: 'Junior Backend Engineer', companyName: 'Startup Maju', startDate: '2022-01-10', endDate: '', description: 'Maintained and added features to Node.js backend systems.' }],
-        education: [{ id: 'edu3', institution: 'Universitas Airlangga', degree: 'S.Kom', fieldOfStudy: 'Sistem Informasi', startDate: '2018-09-01', endDate: '2021-12-20' }],
-        skills: [{ id: 's6', name: 'Node.js', level: 'Intermediate' }, { id: 's7', name: 'MongoDB', level: 'Intermediate' }],
-        documents: [],
-        activity: [{ time: '2024-05-12', event: 'Mendaftar ke sistem' }],
-        applicationHistory: [
-            { id: 'app5', position: 'UI/UX Designer', applied_date: '2024-05-12', status: 'Pending', stages: [{ name: 'Screening', status: 'Pending' }, { name: 'Psikotest', status: 'Belum' }, { name: 'Interview HR', status: 'Belum' }, { name: 'Interview User', status: 'Belum' }, { name: 'Penawaran', status: 'Belum' }] },
-        ],
-    }
+];
+
+// --- MOCK MATCH RESULTS ---
+const MOCK_MATCH_RESULTS: MatchResult[] = [
+    { 
+        candidate: MOCK_CANDIDATES[1], 
+        fitScore: 92, 
+        summary: "Sangat cocok, keahlian teknis sesuai dan pengalaman relevan.", 
+        aiReason: "Direkomendasikan karena memiliki 5+ tahun pengalaman dengan React & TypeScript, sesuai dengan kualifikasi utama posisi Senior Frontend Developer.", 
+        matchingAspects: { 
+            meets: ["React (Advanced)", "TypeScript (Advanced)", "5+ tahun pengalaman", "Lokasi Jakarta"], 
+            lacks: ["Pengalaman dengan GraphQL", "Pengalaman dengan Testing (Jest)"] 
+        } 
+    },
+    { 
+        candidate: MOCK_CANDIDATES[0], 
+        fitScore: 75, 
+        summary: "Cukup cocok, keahlian backend kuat namun perlu adaptasi ke frontend.", 
+        aiReason: "Memiliki dasar pemrograman yang kuat di Go dan Microservices. Meskipun melamar frontend, Ahmad memiliki potensi belajar yang cepat.", 
+        matchingAspects: { 
+            meets: ["Pendidikan S1 TI", "Logika Pemrograman Kuat", "Pengalaman Kolaborasi Tim"], 
+            lacks: ["React (Advanced)", "TypeScript (Advanced)", "CSS Frameworks"] 
+        } 
+    },
 ];
 
 const MOCK_JOB_POSITIONS: JobPosition[] = [
     {
         id: 'job1', title: 'Senior Frontend Developer', company: 'AI Recruit', location: 'Remote', jobLevel: 'Mid-Senior', employmentType: 'Full Time', jobFunction: 'IT', education: 'Sarjana (S1)', salary: { min: 15000000, max: 25000000 }, postedDate: '2024-05-20', logoUrl: 'https://picsum.photos/seed/cortex/100/100', applicants: 25, status: 'Published',
         department: 'Engineering',
-        requiredSkills: [{id: 'rs1', name: 'React', level: 'Advanced'}, {id: 'rs2', name: 'TypeScript', level: 'Advanced'}, {id: 'rs3', name: 'State Management', level: 'Advanced'}],
-        jobDescription: 'Membangun dan memelihara fitur UI yang kompleks untuk platform kami.',
+        requiredSkills: [{id: 'rs1', name: 'React', level: 'Advanced'}, {id: 'rs2', name: 'TypeScript', level: 'Advanced'}],
+        jobDescription: 'Membangun dan memelihara fitur UI yang kompleks.',
         closingDate: '2025-06-30',
         openPositions: 2,
-        requirements: {
-            education: 'Sarjana (S1)',
-            experience_years: 5,
-            certifications: [],
-            skills: ['React', 'TypeScript', 'State Management']
-        }
+        requirements: { education: 'Sarjana (S1)', experience_years: 5, certifications: [], skills: ['React', 'TypeScript'] }
     },
     {
         id: 'job2', title: 'Backend Developer (Golang)', company: 'AI Recruit', location: 'Jakarta', jobLevel: 'Mid-Senior', employmentType: 'Full Time', jobFunction: 'IT', education: 'Sarjana (S1)', salary: { min: 16000000, max: 28000000 }, postedDate: '2024-05-18', logoUrl: 'https://picsum.photos/seed/cortex2/100/100', applicants: 18, status: 'Published',
         department: 'Engineering',
-        requiredSkills: [{id: 'rs4', name: 'Go', level: 'Advanced'}, {id: 'rs5', name: 'Microservices', level: 'Intermediate'}, {id: 'rs6', name: 'PostgreSQL', level: 'Intermediate'}],
-        jobDescription: 'Merancang dan mengimplementasikan layanan backend yang skalabel.',
+        requiredSkills: [{id: 'rs4', name: 'Go', level: 'Advanced'}],
+        jobDescription: 'Merancang layanan backend yang skalabel.',
         closingDate: '2025-06-15',
         openPositions: 3,
-        requirements: {
-            education: 'Sarjana (S1)',
-            experience_years: 4,
-            certifications: [],
-            skills: ['Go', 'Microservices', 'PostgreSQL']
-        }
-    },
-    {
-        id: 'job3', title: 'UI/UX Designer', company: 'AI Recruit', location: 'Bandung', jobLevel: 'Associate', employmentType: 'Full Time', jobFunction: 'IT', education: 'Sarjana (S1)', salary: { min: 10000000, max: 18000000 }, postedDate: '2024-05-15', logoUrl: 'https://picsum.photos/seed/cortex3/100/100', applicants: 32, status: 'Published',
-        department: 'Product',
-        requiredSkills: [{id: 'rs7', name: 'Figma', level: 'Advanced'}, {id: 'rs8', name: 'User Research', level: 'Intermediate'}],
-        jobDescription: 'Mendesain antarmuka pengguna yang intuitif dan menarik.',
-        closingDate: '2025-05-30',
-        openPositions: 1,
-        requirements: {
-            education: 'Sarjana (S1)',
-            experience_years: 2,
-            certifications: [],
-            skills: ['Figma', 'User Research']
-        }
+        requirements: { education: 'Sarjana (S1)', experience_years: 4, certifications: [], skills: ['Go'] }
     }
 ];
 
-const MOCK_MATCH_RESULTS: MatchResult[] = [
-    { candidate: MOCK_CANDIDATES[1], fitScore: 92, summary: "Sangat cocok, keahlian teknis sesuai dan pengalaman relevan.", aiReason: "Direkomendasikan karena memiliki 5+ tahun pengalaman dengan React & TypeScript, sesuai dengan kualifikasi utama.", matchingAspects: { meets: ["React (Advanced)", "TypeScript (Advanced)", "5+ tahun pengalaman"], lacks: ["Pengalaman dengan GraphQL"] }},
-    { candidate: MOCK_CANDIDATES[0], fitScore: 75, summary: "Cukup cocok, keahlian backend kuat namun perlu adaptasi.", aiReason: "Memiliki dasar pemrograman yang kuat di Go, namun posisi yang dibuka adalah Frontend. Memiliki potensi untuk belajar cepat.", matchingAspects: { meets: ["Pendidikan S1 TI", "Logika Pemrograman Kuat"], lacks: ["React (Advanced)", "TypeScript (Advanced)"] }},
-    { candidate: MOCK_CANDIDATES[2], fitScore: 68, summary: "Kurang cocok, pengalaman masih junior.", aiReason: "Pengalaman kerja kurang dari 3 tahun dan level keahlian masih di tingkat menengah, belum memenuhi kualifikasi senior.", matchingAspects: { meets: ["Pendidikan S1", "Familiar dengan JavaScript"], lacks: ["Pengalaman 5+ tahun", "React (Advanced)"] }},
-];
-
-const unsortedNotifications: Notification[] = [
+const MOCK_NOTIFICATIONS: Notification[] = [
     {
         id: 'notif1',
         category: 'ai-matching',
         title: 'Hasil AI Matching Tersedia',
-        message: 'Hasil AI Matching tersedia untuk posisi "UI/UX Designer".',
-        created_at: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
+        message: 'Hasil AI Matching tersedia untuk posisi "Senior Frontend Developer".',
+        created_at: new Date().toISOString(),
         status: 'unread',
-        target_page: '/hrd/matching?position=UI%2FUX%20Designer',
-    },
-    {
-        id: 'notif2',
-        category: 'new-candidate',
-        title: '5 Kandidat Baru Mendaftar',
-        message: '5 kandidat baru mendaftar untuk posisi "Senior Frontend Developer".',
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-        status: 'unread',
-        target_page: '/hrd/kandidat?position=Senior%20Frontend%20Developer',
-    },
-    {
-        id: 'notif3',
-        category: 'document-update',
-        title: 'Kandidat Mengunggah Berkas',
-        message: 'Kandidat Citra Kirana mengunggah berkas baru.',
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 8).toISOString(),
-        status: 'read',
-        target_page: '/hrd/kandidat/cand2?highlight=document',
-        target_candidate_id: 'cand2',
-        target_type: 'document'
-    },
-    {
-        id: 'notif4',
-        category: 'job-alert',
-        title: 'Lowongan Segera Berakhir',
-        message: 'Batas waktu lowongan "Digital Marketing Intern" akan berakhir dalam 3 hari.',
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-        status: 'read',
-        target_page: '/hrd/dashboard',
-    },
-    {
-        id: 'notif5',
-        category: 'application-update',
-        title: 'Update Status Lamaran',
-        message: 'Status lamaran Citra Kirana untuk "Senior Frontend Developer" diubah ke Interview.',
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(), // 3 hours ago
-        status: 'unread',
-        target_page: '/hrd/kandidat/cand2?highlight=application_history',
-        target_candidate_id: 'cand2',
-        target_type: 'application_history'
+        target_page: '/hrd/matching',
     }
 ];
 
-const MOCK_NOTIFICATIONS = unsortedNotifications.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-
 interface HrdState {
     loading: boolean;
-    dashboardStats: {
-        activeJobs: number;
-        totalApplicants: number;
-        avgFitScore: number;
-        qualifiedCandidates: number;
-    };
+    dashboardStats: { activeJobs: number; totalApplicants: number; avgFitScore: number; qualifiedCandidates: number; };
     jobPositions: JobPosition[];
     candidates: Candidate[];
     matchResults: MatchResult[];
@@ -187,21 +116,17 @@ interface HrdState {
     markAsRead: (id: string) => void;
     markAllAsRead: () => void;
     getCandidateById: (id: string) => Candidate | undefined;
+    getJobById: (id: string) => JobPosition | undefined;
     addJob: (job: JobPosition) => void;
     updateJob: (job: JobPosition) => void;
     closeJob: (id: string) => void;
-    getJobById: (id: string) => JobPosition | undefined;
+    updateStageStatus: (candidateId: string, jobId: string, stageName: string, newStatus: RecruitmentStage['status']) => void;
 }
 
 export const useHrdStore = create<HrdState>((set, get) => ({
     loading: false,
-    dashboardStats: {
-        activeJobs: 0,
-        totalApplicants: 0,
-        avgFitScore: 0,
-        qualifiedCandidates: 0,
-    },
-    jobPositions: MOCK_JOB_POSITIONS, // Initialize with MOCK data immediately to prevent empty list on first render
+    dashboardStats: { activeJobs: 0, totalApplicants: 0, avgFitScore: 0, qualifiedCandidates: 0 },
+    jobPositions: MOCK_JOB_POSITIONS,
     candidates: MOCK_CANDIDATES,
     matchResults: [],
     gapAnalysisReports: [],
@@ -211,32 +136,56 @@ export const useHrdStore = create<HrdState>((set, get) => ({
         set({ loading: true });
         await new Promise(res => setTimeout(res, 500));
         set({
-            dashboardStats: {
-                activeJobs: get().jobPositions.length,
-                totalApplicants: 43,
-                avgFitScore: 78,
-                qualifiedCandidates: 12,
-            },
-            // jobPositions: MOCK_JOB_POSITIONS, // Don't overwrite if we have local changes
+            dashboardStats: { activeJobs: get().jobPositions.length, totalApplicants: 43, avgFitScore: 78, qualifiedCandidates: 12 },
             loading: false,
         });
     },
 
     runMatching: async (jobId) => {
         set({ loading: true, matchResults: [] });
-        await new Promise(res => setTimeout(res, 2000)); // Simulate AI processing time
-        set({
-            matchResults: MOCK_MATCH_RESULTS.sort((a, b) => b.fitScore - a.fitScore),
-            loading: false,
-        });
+        
+        // Simulasi proses AI
+        await new Promise(res => setTimeout(res, 2000));
+        
+        const results = MOCK_MATCH_RESULTS.sort((a, b) => b.fitScore - a.fitScore);
+        
+        // Update status 'Screening' pada daftar kandidat berdasarkan fitScore
+        set(state => ({
+            matchResults: results,
+            candidates: state.candidates.map(candidate => {
+                const matchInfo = results.find(m => m.candidate.id === candidate.id);
+                if (!matchInfo) return candidate;
+
+                // Tentukan status Screening: Lolos jika score >= 80, jika tidak Tidak Lolos
+                const screeningStatus: RecruitmentStage['status'] = matchInfo.fitScore >= 80 ? 'Lolos' : 'Tidak Lolos';
+
+                const updatedHistory = (candidate.applicationHistory || []).map(app => {
+                    // Hanya update lamaran yang sesuai dengan posisi yang sedang di-match
+                    // (Karena data mock terbatas, kita asumsikan update Screening stage)
+                    const updatedStages = app.stages.map(stage => 
+                        stage.name === 'Screening' ? { ...stage, status: screeningStatus } : stage
+                    );
+
+                    let overallStatus = app.status;
+                    if (screeningStatus === 'Tidak Lolos') {
+                        overallStatus = 'Ditolak';
+                    }
+
+                    return { ...app, stages: updatedStages, status: overallStatus };
+                });
+
+                return { ...candidate, applicationHistory: updatedHistory };
+            }),
+            loading: false 
+        }));
     },
-    
+
     fetchRanking: async (jobId) => {
         set({ loading: true });
         await new Promise(res => setTimeout(res, 500));
-        set({
+        set({ 
             matchResults: MOCK_MATCH_RESULTS.sort((a, b) => b.fitScore - a.fitScore),
-            loading: false
+            loading: false 
         });
     },
 
@@ -252,72 +201,53 @@ export const useHrdStore = create<HrdState>((set, get) => ({
 
         const reports: GapAnalysisReport[] = MOCK_CANDIDATES.map(candidate => {
             const missing = job.requiredSkills.filter(reqSkill => 
-                !candidate.skills.some(canSkill => canSkill.name === reqSkill.name && canSkill.level === reqSkill.level)
-            ).map(s => `${s.name} (${s.level})`);
+                !candidate.skills.some(canSkill => canSkill.name === reqSkill.name)
+            ).map(s => s.name);
             
             return {
                 candidate,
-                gapScore: missing.length * 20, // Simple gap scoring
+                gapScore: missing.length * 20,
                 missingCompetencies: missing.length > 0 ? missing : ["Tidak ada kesenjangan kompetensi utama"],
-                trainingRecommendations: missing.map(skill => `Ambil kursus online untuk ${skill}.`)
+                trainingRecommendations: missing.map(skill => `Ambil kursus online untuk memperdalam keahlian ${skill}.`)
             };
         });
 
         set({ gapAnalysisReports: reports, loading: false });
     },
-    
-    markAsRead: (id: string) => {
-        set((state) => ({
-            notifications: state.notifications.map(notif =>
-                notif.id === id ? { ...notif, status: 'read' } : notif
-            ),
-        }));
-    },
 
-    markAllAsRead: () => {
-        set((state) => ({
-            notifications: state.notifications.map(notif => ({ ...notif, status: 'read' }))
-        }));
-    },
-    
-    getCandidateById: (id: string) => {
-        return get().candidates.find(c => c.id === id);
-    },
+    markAsRead: (id) => set(state => ({ notifications: state.notifications.map(n => n.id === id ? { ...n, status: 'read' } : n) })),
+    markAllAsRead: () => set(state => ({ notifications: state.notifications.map(n => ({ ...n, status: 'read' })) })),
+    getCandidateById: (id) => get().candidates.find(c => c.id === id),
+    getJobById: (id) => get().jobPositions.find(j => j.id === id),
+    addJob: (job) => set(state => ({ jobPositions: [...state.jobPositions, job] })),
+    updateJob: (updatedJob) => set(state => ({ jobPositions: state.jobPositions.map(j => j.id === updatedJob.id ? updatedJob : j) })),
+    closeJob: (id) => set(state => ({ jobPositions: state.jobPositions.map(j => j.id === id ? { ...j, status: 'Closed' } : j) })),
 
-    getJobById: (id: string) => {
-        return get().jobPositions.find(j => j.id === id);
-    },
-
-    addJob: (job: JobPosition) => {
+    updateStageStatus: (candidateId, jobId, stageName, newStatus) => {
         set(state => ({
-            jobPositions: [...state.jobPositions, job]
-        }));
-        
-        // Mocking the backend call output as requested
-        const backendPayload = {
-            title: job.title,
-            department: job.department,
-            location: job.location,
-            type: job.employmentType,
-            description: job.jobDescription,
-            requirements: job.requirements,
-            salary_range: job.salary,
-            closing_date: job.closingDate,
-            open_positions: job.openPositions,
-            status: job.status?.toLowerCase()
-        };
-        console.log("POST /jobs", JSON.stringify(backendPayload, null, 2));
-    },
+            candidates: state.candidates.map(candidate => {
+                if (candidate.id !== candidateId) return candidate;
 
-    updateJob: (updatedJob: JobPosition) => {
-        set(state => ({
-            jobPositions: state.jobPositions.map(job => job.id === updatedJob.id ? updatedJob : job)
-        }));
-    },
+                const updatedHistory = (candidate.applicationHistory || []).map(app => {
+                    const updatedStages = app.stages.map(stage => 
+                        stage.name === stageName ? { ...stage, status: newStatus } : stage
+                    );
 
-    closeJob: (id: string) => {
-        set(state => ({
-            jobPositions: state.jobPositions.map(job => job.id === id ? { ...job, status: 'Closed' } : job)
+                    let overallStatus: ApplicationHistory['status'] = 'Dalam Proses';
+                    const hasFailed = updatedStages.some(s => s.status === 'Tidak Lolos');
+                    const penawaranLolos = updatedStages.find(s => s.name === 'Penawaran')?.status === 'Lolos';
+
+                    if (hasFailed) {
+                        overallStatus = 'Ditolak';
+                    } else if (penawaranLolos) {
+                        overallStatus = 'Diterima';
+                    }
+
+                    return { ...app, stages: updatedStages, status: overallStatus };
+                });
+
+                return { ...candidate, applicationHistory: updatedHistory };
+            })
         }));
     }
 }));

@@ -1,10 +1,11 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useHrdStore } from '../../store/useHrdStore';
 import { Candidate, Document as DocType, Activity, WorkExperience, Education, ApplicationHistory } from '../../types';
 import { EnvelopeIcon, MapPinIcon, BriefcaseIcon, DocumentTextIcon, ArrowDownTrayIcon, SparklesIcon, ChevronLeftIcon, AcademicCapIcon, BanknotesIcon, ClockIcon } from '@heroicons/react/24/outline';
-import format from 'date-fns/format';
-import idLocale from 'date-fns/locale/id';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
 
 // --- HELPER FUNCTIONS ---
 
@@ -58,14 +59,17 @@ const SectionCard: React.FC<{ title: string; icon?: React.ReactNode; children: R
 
 const WorkExperienceSection: React.FC<{ experiences: WorkExperience[] }> = ({ experiences }) => (
     <SectionCard title="Pengalaman Kerja" icon={<BriefcaseIcon className="h-5 w-5 text-gray-500" />}>
-        <div className="space-y-5 relative before:absolute before:inset-0 before:ml-2.5 before:w-0.5 before:bg-gray-200">
+        <div className="relative ml-2 space-y-6 border-l-2 border-gray-100 pb-2">
             {experiences.length > 0 ? experiences.map(exp => (
-                <div key={exp.id} className="relative pl-8">
-                     <div className="absolute left-0 top-1 w-2.5 h-2.5 bg-gray-300 rounded-full border-4 border-white ring-2 ring-gray-200"></div>
-                     <p className="font-bold text-black">{exp.jobTitle}</p>
-                     <p className="text-sm font-medium text-gray-700">{exp.companyName}</p>
-                     <p className="text-xs text-gray-500 my-1">{formatDateRange(exp.startDate, exp.endDate)}</p>
-                     <p className="text-sm text-gray-600 leading-relaxed">{exp.description}</p>
+                <div key={exp.id} className="relative pl-6">
+                     {/* Bullet - Precisely centered on a 2px border */}
+                     <div className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 bg-white border-2 border-gray-300 rounded-full shadow-sm z-10"></div>
+                     <div className="flex flex-col">
+                        <p className="font-bold text-black text-sm leading-tight">{exp.jobTitle}</p>
+                        <p className="text-xs font-semibold text-gray-700 mt-1">{exp.companyName}</p>
+                        <p className="text-[11px] text-gray-400 mt-0.5">{formatDateRange(exp.startDate, exp.endDate)}</p>
+                        <p className="text-sm text-gray-600 leading-relaxed mt-2">{exp.description}</p>
+                     </div>
                 </div>
             )) : <p className="text-sm text-gray-500">Tidak ada pengalaman kerja yang dicantumkan.</p>}
         </div>
@@ -105,8 +109,10 @@ const DocumentCard: React.FC<{ doc: DocType }> = ({ doc }) => (
             <DocumentTextIcon className="h-6 w-6 text-gray-500 flex-shrink-0" />
             <div className="flex-grow min-w-0">
                 <p className="font-semibold text-black truncate">{doc.name}</p>
-                <p className="text-xs text-gray-400">Diunggah {format(new Date(doc.uploadedAt), 'dd MMM yyyy', { locale: idLocale })}</p>
-            </div>
+                <p className="text-xs text-gray-400">
+                Diunggah {format(new Date(doc.uploadedAt), 'dd MMM yyyy', { locale: id })}
+                </p>
+        </div>
         </div>
         <button className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex-shrink-0" aria-label="Download">
             <ArrowDownTrayIcon className="h-5 w-5" />
@@ -122,7 +128,7 @@ const ActivityItem: React.FC<{ activity: Activity, isLast: boolean }> = ({ activ
         </div>
         <div>
             <p className="font-medium text-black">{activity.event}</p>
-            <p className="text-xs text-gray-500">{format(new Date(activity.time), "EEEE, dd MMM yyyy 'pukul' HH:mm", { locale: idLocale })}</p>
+            <p className="text-xs text-gray-500">{format(new Date(activity.time), "EEEE, dd MMM yyyy 'pukul' HH:mm", { locale: id})}</p>
         </div>
     </div>
 );
@@ -154,7 +160,7 @@ const ApplicationHistorySection: React.FC<{ applications: ApplicationHistory[] }
                                 <div>
                                     <p className="font-bold text-black">{app.position}</p>
                                     <p className="text-sm text-gray-500 mt-1">
-                                        Tanggal Melamar: {format(new Date(app.applied_date), 'dd MMMM yyyy', { locale: idLocale })}
+                                        Tanggal Melamar: {format(new Date(app.applied_date), 'dd MMMM yyyy', { locale: id })}
                                     </p>
                                 </div>
                                 <div className="flex-shrink-0">

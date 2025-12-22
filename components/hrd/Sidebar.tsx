@@ -1,11 +1,10 @@
+
 import React, { useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useUiStore } from '../../store/useUiStore';
 import {
     ChartBarIcon,
     CpuChipIcon,
-    TrophyIcon,
-    PresentationChartBarIcon,
     ChevronDoubleLeftIcon,
     UsersIcon,
     BriefcaseIcon,
@@ -14,10 +13,8 @@ import {
 const navItems = [
     { to: '/hrd/dashboard', icon: ChartBarIcon, label: 'Dashboard' },
     { to: '/hrd/jobs', icon: BriefcaseIcon, label: 'Lowongan Kerja' },
-    { to: '/hrd/kandidat', icon: UsersIcon, label: 'Daftar Kandidat' },
+    { to: '/hrd/kandidat', icon: UsersIcon, label: 'Manajemen Kandidat' },
     { to: '/hrd/matching', icon: CpuChipIcon, label: 'AI Matching' },
-    { to: '/hrd/ranking', icon: TrophyIcon, label: 'Peringkat Kandidat' },
-    { to: '/hrd/gap-analysis', icon: PresentationChartBarIcon, label: 'Analisis Kesenjangan' },
 ];
 
 const Sidebar: React.FC = () => {

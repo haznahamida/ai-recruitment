@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useHrdStore } from '../../store/useHrdStore';
 import { MatchResult } from '../../types';
+import { ChevronDownIcon } from '@heroicons/react/24/outline';
 
 const MatchingEngine: React.FC = () => {
     const { jobPositions, matchResults, runMatching, loading, fetchDashboardStats } = useHrdStore();
@@ -75,25 +76,32 @@ const MatchingEngine: React.FC = () => {
             </header>
 
             <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-                <h2 className="text-xl font-bold text-black mb-4">Konfigurasi</h2>
+                <h2 className="text-xl font-bold text-black mb-6 border-b border-gray-100 pb-2">Konfigurasi</h2>
                 <div className="flex flex-col sm:flex-row items-end gap-4">
-                    <div className="flex-grow w-full">
-                        <label htmlFor="job-position" className="block text-sm font-medium text-black mb-1">Pilih Posisi Pekerjaan</label>
-                        <select
-                            id="job-position"
-                            value={selectedJob}
-                            onChange={(e) => setSelectedJob(e.target.value)}
-                            className="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
-                        >
-                            {jobPositions.map(job => (
-                                <option key={job.id} value={job.id}>{job.title}</option>
-                            ))}
-                        </select>
+                    <div className="flex-grow w-full max-w-xs">
+                        <label htmlFor="job-position" className="block text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">
+                            Pilih Posisi Pekerjaan
+                        </label>
+                        <div className="relative">
+                            <select
+                                id="job-position"
+                                value={selectedJob}
+                                onChange={(e) => setSelectedJob(e.target.value)}
+                                className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-4 pr-10 py-2.5 text-black font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none cursor-pointer"
+                            >
+                                {jobPositions.map(job => (
+                                    <option key={job.id} value={job.id}>{job.title}</option>
+                                ))}
+                            </select>
+                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                                <ChevronDownIcon className="h-4 w-4" />
+                            </div>
+                        </div>
                     </div>
                     <button
                         onClick={handleStartMatching}
                         disabled={isProcessing || !selectedJob}
-                        className="w-full sm:w-auto bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300 disabled:cursor-wait"
+                        className="w-full sm:w-auto bg-blue-600 text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300 disabled:cursor-wait h-[42px] flex items-center justify-center"
                     >
                         {isProcessing ? 'Memproses...' : 'Mulai Pencocokan AI'}
                     </button>
